@@ -1,6 +1,6 @@
 package com.capsols.payoneerapp.Models;
 
-public class ReturnCode {
+public class ReturnCodeModel {
 
     private String name;
     private String source;

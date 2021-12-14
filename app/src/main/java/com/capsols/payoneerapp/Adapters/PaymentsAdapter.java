@@ -8,19 +8,20 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.capsols.payoneerapp.Models.Applicable;
+import com.capsols.payoneerapp.Models.ApplicableNetworkModel;
 import com.capsols.payoneerapp.R;
 import com.capsols.payoneerapp.ViewHolders.PaymentMethodsViewHolder;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentsAdapter extends RecyclerView.Adapter<PaymentMethodsViewHolder> {
 
-    private List<Applicable> myApplicableNetworks = new ArrayList<>();
+    private List<ApplicableNetworkModel> myApplicableNetworks = new ArrayList<>();
     private Context mContext;
 
-    public PaymentsAdapter(List<Applicable> ApplicableNetworks, Context context)
+    public PaymentsAdapter(List<ApplicableNetworkModel> ApplicableNetworks, Context context)
     {
         this.myApplicableNetworks = ApplicableNetworks;
         this.mContext = context;
@@ -36,8 +37,10 @@ public class PaymentsAdapter extends RecyclerView.Adapter<PaymentMethodsViewHold
     @Override
     public void onBindViewHolder(@NonNull PaymentMethodsViewHolder holder, int position) {
 
-        Applicable selectedApplicableNetwork = myApplicableNetworks.get(position);
+        ApplicableNetworkModel selectedApplicableNetwork = myApplicableNetworks.get(position);
+        String logoUrl = selectedApplicableNetwork.getLinks().getImgUrl()+"";
         holder.myPaymentMethodTextView.setText(selectedApplicableNetwork.getName());
+        Picasso.get().load(logoUrl).into(holder.myPaymentMethodImageView);
 
     }
     @Override

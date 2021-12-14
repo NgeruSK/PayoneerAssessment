@@ -1,14 +1,14 @@
 package com.capsols.payoneerapp.Models;
 
 import com.google.gson.annotations.SerializedName;
-public class Applicable {
+public class ApplicableNetworkModel {
     @SerializedName("code")
     private String name;
 
     @SerializedName("label")
     private String desc;
 
-    private Links links;
+    private LinksModel linksModel;
 
     public String getName() {
         return name;
@@ -26,11 +26,11 @@ public class Applicable {
         this.desc = desc;
     }
 
-    public Links getLinks() {
-        return links;
+    public LinksModel getLinks() {
+        return linksModel;
     }
 
-    public void setLinks(Links links) {
-        this.links = links;
+    public void setLinks(LinksModel linksModel) {
+        this.linksModel = linksModel;
     }
 }

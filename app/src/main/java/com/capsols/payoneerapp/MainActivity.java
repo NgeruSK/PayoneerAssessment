@@ -10,10 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.capsols.payoneerapp.Adapters.PaymentsAdapter;
-import com.capsols.payoneerapp.Models.Applicable;
-import com.capsols.payoneerapp.Models.ApplicableNetwork;
-import com.capsols.payoneerapp.Models.PaymentMethod;
-import com.capsols.payoneerapp.Models.PaymentObj;
+import com.capsols.payoneerapp.Models.ApplicableNetworkModel;
+import com.capsols.payoneerapp.Models.PaymentObjectModel;
 import com.capsols.payoneerapp.Retrofit.RetrofitClient;
 
 import java.util.ArrayList;
@@ -25,15 +23,14 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    //global declarations
     RecyclerView viewPayNetworks;
     Toolbar appToolBar;
     RetrofitClient retrofitClient;
     PaymentsAdapter myRecyclerViewAdapter;
-    private List<ApplicableNetwork> myApplicableNetworks = new ArrayList<>();
-    private List<Applicable> applicableNetworks = new ArrayList<>();
+    private List<ApplicableNetworkModel> applicableNetworks = new ArrayList<>();
 
-
-
+    //Tag string for logs ease of tracing
     String TAG = MainActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
         retrofitClient = new RetrofitClient();
         //views initialization
         innitViews();
-
-        fetchApplicableNetworks();
 
        // action bar and icon setup
         setSupportActionBar(appToolBar);
@@ -59,74 +54,54 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    //Retrofit call to fetch the JSON object in question
     private void fetchApplicableNetworks()
     {
-     Call<PaymentObj> myCall = retrofitClient.getMyApi().getApplicableNetworks();
+     Call<PaymentObjectModel> myCall = retrofitClient.getMyApi().getApplicableNetworks();
 
-     myCall.enqueue(new Callback<PaymentObj>() {
+     myCall.enqueue(new Callback<PaymentObjectModel>() {
          @Override
-         public void onResponse(Call<PaymentObj> call, Response<PaymentObj> response) {
-             if(response.isSuccessful())
+         public void onResponse(Call<PaymentObjectModel> call, Response<PaymentObjectModel> response) {
+             if(response.code() == 200 )
              {
                  Log.e(TAG, "onResponse: success");
-                 PaymentObj loadedMethods = response.body();
+                 PaymentObjectModel loadedMethods = response.body();
                  runOnUiThread(new Runnable() {
                      @Override
                      public void run() {
-                         saveApplicables(loadedMethods);
+                         parseAndInflateRecyclerview(loadedMethods);
                      }
                  });
 
-
+             }
+             else if(response.code() == 404)
+             {
+                 Log.e(TAG, "onResponse_Err : fail - server cannot find resource");
+             }
+             else if(response.code() == 500)
+             {
+                 Log.e(TAG, "onResponse_Err : fail - internal server error");
              }
              else
              {
-                 Log.e(TAG, "onResponse_Err : fail");
+                 Log.e(TAG, "onResponse_Err : fail - Request error");
              }
          }
 
          @Override
-         public void onFailure(Call<PaymentObj> call, Throwable t) {
+         public void onFailure(Call<PaymentObjectModel> call, Throwable t) {
              Log.e(TAG, "onFailure: "+t.toString());
          }
      });
     }
-
-    private void saveApplicables(PaymentObj myFtechedObject)
+    //this method will be called to show the methods on recyclerview as well as parse the JSON object
+    private void parseAndInflateRecyclerview(PaymentObjectModel myFtechedObject)
     {
         applicableNetworks = myFtechedObject.getNetwork().getApplicable();
         Log.e(TAG, "saveApplicables: "+applicableNetworks.size());
-
-    }
-
-    private void inflateRecycler()
-    {
         myRecyclerViewAdapter = new PaymentsAdapter(applicableNetworks, getApplicationContext());
         viewPayNetworks.setAdapter(myRecyclerViewAdapter);
         viewPayNetworks.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-    }
-    private void callRetrofit() {
-        Call<PaymentMethod> myCalls = retrofitClient.getMyApi().getNetworks();
-
-        myCalls.enqueue(new Callback<PaymentMethod>() {
-            @Override
-            public void onResponse(Call<PaymentMethod> call, Response<PaymentMethod> response) {
-                if(response.isSuccessful())
-                {
-                    Log.e(TAG, "onResponse: success");
-                    PaymentMethod loadedMethods = response.body();
-                }
-                else{
-                    Log.e(TAG, "onResponse_Err : fail");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PaymentMethod> call, Throwable t) {
-                Log.e(TAG, "onFailure: "+t.toString());
-            }
-        });
-
     }
 
     /*
@@ -134,9 +109,16 @@ public class MainActivity extends AppCompatActivity {
      */
     private void innitViews()
     {
-
         //Recyclerview for applicable payment networks
         viewPayNetworks = (RecyclerView) findViewById(R.id.recViewBankList);
+        viewPayNetworks.setHasFixedSize(true);
         appToolBar = (Toolbar) findViewById(R.id.toolbar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //call API to check applicable payment networks
+        fetchApplicableNetworks();
     }
 }

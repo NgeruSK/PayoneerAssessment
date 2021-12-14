@@ -1,6 +1,5 @@
 package com.capsols.payoneerapp.ViewHolders;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +18,7 @@ public class PaymentMethodsViewHolder extends RecyclerView.ViewHolder {
     public PaymentMethodsViewHolder(@NonNull View itemView) {
         super(itemView);
         myView = itemView;
-        myPaymentMethodTextView = myView.findViewById(R.id.imgMethodlogo);
-        myPaymentMethodImageView =  myView.findViewById(R.id.tvMethodName);
+        myPaymentMethodTextView = myView.findViewById(R.id.tvMethodName);
+        myPaymentMethodImageView =  myView.findViewById(R.id.imgMethodlogo);
     }
 }
