@@ -1,3 +1,2 @@
-# PayoneerAssessment
-An android application for technical assessment for Payoneer
+# PayoneerAPIs
 Classes have been wrapped in packages
